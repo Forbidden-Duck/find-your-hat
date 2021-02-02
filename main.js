@@ -155,7 +155,11 @@ class Field {
     }
 
     clear() {
-        console.clear();
+        try {
+            console.clear();
+        } catch (err) {
+            console.log("\n".repeat(25));
+        }
     }
 
     print() {
