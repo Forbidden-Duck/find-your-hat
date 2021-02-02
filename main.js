@@ -6,7 +6,6 @@ const fieldCharacter = '░';
 const pathCharacter = '*';
 
 let fieldIsValid = false;
-let travel = 0;
 
 class Field {
     /**
