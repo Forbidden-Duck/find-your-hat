@@ -1,9 +1,9 @@
-const prompt = require('prompt-sync')({ sigint: true });
+const tkit = require("terminal-kit").terminal;
 
-const hat = '^';
-const hole = 'O';
-const fieldCharacter = '░';
-const pathCharacter = '*';
+const hat = '\u001b[30m\u001b[43m^\u001b[0m';
+const hole = '█';
+const fieldCharacter = ' ';
+const pathCharacter = '\u001b[30m\u001b[42m§\u001b[0m';
 
 let fieldIsValid = false;
 
@@ -192,16 +192,16 @@ class Field {
 
     processMove(choice) {
         switch (choice.toLowerCase()) {
-            case "u": {
+            case "w": {
                 return this.up();
             }
-            case "d": {
+            case "s": {
                 return this.down();
             }
-            case "l": {
+            case "a": {
                 return this.left();
             }
-            case "r": {
+            case "d": {
                 return this.right();
             }
             default: {
@@ -279,7 +279,7 @@ const field = new Field(true, 50);
 
 let gameIsActive = true;
 let previousWasInvalid = false;
-while (gameIsActive == true) {
+function loadPrompt(userPrompt) {
     field.clear(); // Clear and print fields on prompt finish
     field.print();
 
@@ -287,7 +287,8 @@ while (gameIsActive == true) {
         previousWasInvalid = false;
         console.log("Invalid move, try again");
     }
-    const userPrompt = field.processMove(prompt("Where do you want to move (U, D, L, R)? "));
+
+    console.log("Where do you want to move (W, A, S, D)?");
     if (userPrompt != "true") {
         switch (userPrompt) {
             case "outofbounds": {
@@ -316,4 +317,26 @@ while (gameIsActive == true) {
             }
         }
     }
+
+    if (gameIsActive != true) {
+        return cancel();
+    }
 }
+
+function cancel() {
+    tkit.grabInput(false);
+    setTimeout(() => process.exit(), 100);
+}
+
+field.clear(); // Clear and print fields on prompt finish
+field.print();
+console.log("Where do you want to move (W, A, S, D)?");
+
+tkit.grabInput({ mouse: "button" });
+tkit.on("key", key => {
+    if (key === "CTRL_C") {
+        cancel();
+    } else if (["w", "a", "s", "d"].includes(key.toLowerCase())) {
+        loadPrompt(field.processMove(key));
+    }
+});
